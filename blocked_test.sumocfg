@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-01-25T22:35:08.434520-05:00 by Eclipse SUMO GUI 1.25.0
+-->
+
+<sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="hw_401.net.xml"/>
+        <route-files value="hw_401.rou.xml"/>
+    </input>
+
+    <processing>
+        <time-to-teleport value="-1"/>
+    </processing>
+
+</sumoConfiguration>

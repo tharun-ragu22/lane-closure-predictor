@@ -1,0 +1,16 @@
+<configuration>
+  <input>
+    <net-file value="net.net.xml"/>
+    <route-files value="routes.rou.xml"/>
+  </input>
+  <time>
+    <begin value="0"/>
+    <end value="200"/>
+  </time>
+  <output>
+    <tripinfo-output value="tripinfo.xml"/>
+    <edgeData-output value="edgedata.xml"/>
+  </output>
+
+</configuration>
+  

@@ -1,0 +1,10 @@
+<configuration>
+  <input>
+    <net-file value="hw_401.net.xml"/>
+    <route-files value="hw_401.rou_big.xml"/>
+  </input>
+  <time>
+    <begin value="0"/>
+    <end value="3600"/>
+  </time>
+</configuration>
