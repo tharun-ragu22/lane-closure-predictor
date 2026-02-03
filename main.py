@@ -54,7 +54,7 @@ with open(control_file, 'r') as file, open(blocked_file, 'r') as file2:
     control_buffer = file.read()
     blocked_buffer = file2.read()
 
-client = genai.Client(api_key = "AIzaSyCIQZ7VWLKPhmG2vBJ-45WK44TZze7f1T4")
+client = genai.Client(api_key = GEMINI_KEY)
 response = client.models.generate_content(
     model="gemini-2.5-flash",
     contents=f"""

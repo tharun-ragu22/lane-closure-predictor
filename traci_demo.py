@@ -1,11 +1,12 @@
 import os
 import sys
-sys.path.append(os.path.join('C:',os.sep,'Program Files (x86)',os.sep,'Eclipse',os.sep,'Sumo',os.sep,'tools'))
+# sys.path.append(os.path.join('C:',os.sep,'Program Files (x86)',os.sep,'Eclipse',os.sep,'Sumo',os.sep,'tools'))
 import traci
+import subprocess
 
 def run_simulation(edge_id: int | None = None) -> str:
 
-    sumoBinary = r"C:\Program Files (x86)\Eclipse\Sumo\bin\sumo.exe"
+    sumoBinary = "sumo"
     output_file_name = f"stats{f"_{edge_id}" if edge_id is not None else "_no_blocks"}.xml"
     sumoCmd = [sumoBinary, "-c", 
             "hw_401.sumocfg", 
@@ -16,7 +17,14 @@ def run_simulation(edge_id: int | None = None) -> str:
 
 
 
-    traci.start(sumoCmd)
+    try:
+        traci.start(sumoCmd)
+    except traci.FatalTraCIError:
+        # If it crashes, manually run the command to see the hidden error message
+        result = subprocess.run(sumoCmd, capture_output=True, text=True)
+        print("SUMO STDERR:", result.stderr)
+        print("SUMO STDOUT:", result.stdout)
+        raise
     if edge_id is not None:
         traci.edge.setDisallowed(str(edge_id), ["passenger"])
 

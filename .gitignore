@@ -1,4 +1,6 @@
 /.venv/**
 /__pycache__/*
 *.xml
+!hw_401.net.xml
+!hw_401.rou_big.xml
 .env
