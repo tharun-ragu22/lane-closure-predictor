@@ -55,6 +55,31 @@ with open(control_file, 'r') as file, open(blocked_file, 'r') as file2:
     blocked_buffer = file2.read()
 
 client = genai.Client(api_key = GEMINI_KEY)
+
+import json
+import os
+from google.cloud import storage
+
+def save_results_to_gcs(data_dict):
+    # Get the unique execution ID provided by Cloud Run
+    execution_id = os.environ.get("CLOUD_RUN_EXECUTION", "local_test")
+    bucket_name = os.environ.get("RESULTS_BUCKET")
+    
+    # Initialize the GCS client
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    
+    # Create a blob (file) named after the execution ID
+    blob = bucket.blob(f"results/sim_{execution_id}.json")
+    
+    # Upload the data as a JSON string
+    blob.upload_from_string(
+        data=json.dumps(data_dict),
+        content_type='application/json'
+    )
+    print(f"Logged results to gs://{bucket_name}/{blob.name}")
+
+
 response = client.models.generate_content(
     model="gemini-2.5-flash",
     contents=f"""
@@ -71,4 +96,6 @@ response = client.models.generate_content(
 
             """
 )
+save_results_to_gcs({"status": "complete", "analysis": response.text})
+
 print(response.text)
