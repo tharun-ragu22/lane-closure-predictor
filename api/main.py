@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException
 import os
 from google.cloud import storage
 import json
+from google.cloud import run_v2
+
 app = FastAPI()
 
 @app.get("/")
@@ -30,6 +32,28 @@ def get_simulation_result(execution_id: str):
     except Exception as e:
         print(f"Error fetching from GCS: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/run-simulation")
+def trigger_sumo_job():
+    client = run_v2.JobsClient()
+    
+    # Define the full path to your job
+    project = "commute-time-v1" # or use os.environ.get("GOOGLE_CLOUD_PROJECT")
+    location = "us-central1"
+    job_name = "sumo-simulation-job"
+    
+    job_path = f"projects/{project}/locations/{location}/jobs/{job_name}"
+    
+    try:
+        # Trigger the execution
+        operation = client.run_job(name=job_path)
+        # The execution name looks like 'sumo-simulation-job-xyz123'
+        execution_id = operation.metadata.name.split('/')[-1]
+        
+        return {"status": "started", "execution_id": execution_id}
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to start simulation")
 
 if __name__ == "__main__":
     # Cloud Run injects the PORT environment variable automatically
