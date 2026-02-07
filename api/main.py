@@ -3,6 +3,10 @@ import os
 from google.cloud import storage
 import json
 from google.cloud import run_v2
+from pydantic import BaseModel
+
+class SimulationRequestBody(BaseModel):
+    desc: str
 
 app = FastAPI()
 
@@ -34,7 +38,7 @@ def get_simulation_result(execution_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/run-simulation")
-def trigger_sumo_job():
+def trigger_sumo_job(body: SimulationRequestBody):
     client = run_v2.JobsClient()
     
     # Define the full path to your job
@@ -43,10 +47,26 @@ def trigger_sumo_job():
     job_name = "sumo-simulation-job"
     
     job_path = f"projects/{project}/locations/{location}/jobs/{job_name}"
+
+    # Build typed overrides via the client module to avoid static-import issues
+    container_override = run_v2.types.ContainerOverride(
+        args=[body.desc]
+    )
+
+    overrides_obj = run_v2.types.JobOverrides(
+        container_overrides=[container_override]
+    )
+
+    request = run_v2.RunJobRequest(
+        name=job_path,
+        overrides=overrides_obj
+    )
     
     try:
+        
+            
         # Trigger the execution
-        operation = client.run_job(name=job_path)
+        operation = client.run_job(request=request)
         # The execution name looks like 'sumo-simulation-job-xyz123'
         execution_id = operation.metadata.name.split('/')[-1]
         
