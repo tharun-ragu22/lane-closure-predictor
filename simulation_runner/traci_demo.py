@@ -5,7 +5,7 @@ import traci
 import subprocess
 
 def run_simulation(edge_id: int | None = None) -> str:
-
+    print("starting simulation while blocking edge", edge_id)
     sumoBinary = "sumo"
     output_file_name = f"stats{f"_{edge_id}" if edge_id is not None else "_no_blocks"}.xml"
     sumoCmd = [sumoBinary, "-c", 

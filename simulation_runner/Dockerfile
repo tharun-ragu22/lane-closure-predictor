@@ -19,4 +19,4 @@ COPY . .
 
 # Set the command to run your script
 # Using python3 instead of py for the Linux container
-CMD ["python3", "main.py"]
+ENTRYPOINT ["python3", "main.py"]
