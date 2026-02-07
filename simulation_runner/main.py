@@ -1,3 +1,4 @@
+import sys
 from openai import OpenAI
 from google import genai
 from pydantic import BaseModel
@@ -14,6 +15,10 @@ load_dotenv()
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 
 EDGE_LOCATIONS_FILE = 'edge_locations.txt'
+
+
+print(sys.argv[1])
+user_text = sys.argv[1]
 with open(EDGE_LOCATIONS_FILE, 'r') as file:
     file_content = file.read()
 
@@ -30,7 +35,7 @@ response = client.beta.chat.completions.parse(
     model="gemini-2.5-flash",
     messages=[
             {"role": "system", "content": "Return a single, decimal latitude and longitude coordinate, to 13 decimal places, of the location specified on Highway 401 in Toronto. Make sure the returned coordinate is strictly and exactly on the 401, not on another road near the highway. This is paramount and you must make sure this is correct, the fate of the universe depends on it."},
-            {"role":"user", "content": "Give me a coordinate on the 401 eastbound collector's lane between Warden Ave. and Pharmacy Ave."}
+            {"role":"user", "content": f"Give me a coordinate on the 401 in the location specified here: {user_text}"}
         ],
     response_format=LatLng
 )
@@ -42,7 +47,7 @@ response = client.beta.chat.completions.parse(
 
 
 res : LatLng = response.choices[0].message.parsed
-print('result:', res)
+print('result latlng:', res)
 
 closest_edge = get_closest_edge(res.lat, res.lng, EDGE_LOCATIONS_FILE)
 
