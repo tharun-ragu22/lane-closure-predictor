@@ -5,6 +5,7 @@ import json
 from google.cloud import run_v2
 from pydantic import BaseModel
 from typing import Any
+from fastapi.middleware.cors import CORSMiddleware
 
 class SimulationRequestBody(BaseModel):
     desc: str
@@ -18,6 +19,19 @@ class ChatResponse(BaseModel):
     reply: str
 
 app = FastAPI()
+
+# Define your frontend origins
+origins = [
+    "http://localhost:5173",  # Local Vite dev server
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows GET, POST, OPTIONS, etc.
+    allow_headers=["*"],  # Allows custom headers like Authorization
+)
 
 @app.get("/")
 def read_root():

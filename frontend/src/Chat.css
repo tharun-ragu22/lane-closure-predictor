@@ -33,3 +33,20 @@
 
 html, body, #root { height:100%; margin:0; }
 
+/* typing/loading indicator */
+.msg.typing .bubble{ background: #0f1724; border:1px solid rgba(255,255,255,0.02); display:flex; gap:6px; align-items:center }
+.dot{ display:inline-block; width:8px; height:8px; background:#7fb0d8; border-radius:50%; opacity:0.2; animation: blink 1s infinite }
+.dot:nth-child(1){ animation-delay: 0s }
+.dot:nth-child(2){ animation-delay: 0.12s }
+.dot:nth-child(3){ animation-delay: 0.24s }
+
+@keyframes blink{
+  0%{ opacity:0.2; transform: translateY(0) }
+  50%{ opacity:1; transform: translateY(-4px) }
+  100%{ opacity:0.2; transform: translateY(0) }
+}
+
+/* disabled composer */
+.composer textarea[disabled]{ opacity:0.6 }
+.composer .send[disabled]{ opacity:0.6; cursor:not-allowed }
+

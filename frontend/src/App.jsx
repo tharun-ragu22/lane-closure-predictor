@@ -6,13 +6,14 @@ export default function App(){
   ])
   const [input, setInput] = useState('')
   const sending = useRef(false)
+  const [isLoading, setIsLoading] = useState(false)
   const messagesRef = useRef(null)
 
   useEffect(()=>{
     // auto-scroll to bottom when messages change
     const el = messagesRef.current
     if(el) el.scrollTop = el.scrollHeight
-  }, [messages])
+  }, [messages, isLoading])
 
   async function sendMessage(){
     if(!input.trim() || sending.current) return
@@ -20,18 +21,20 @@ export default function App(){
     setMessages(m => [...m, {from: 'user', text: userMsg}])
     setInput('')
     sending.current = true
+    setIsLoading(true)
     try{
-      const res = await fetch('/api/chat', {
-        method: 'POST',
+      const res = await fetch('https://fastapi-test-626046981738.us-central1.run.app/get-result/sumo-simulation-job-spnrh', {
+        method: 'GET',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({message: userMsg})
+        // body: JSON.stringify({message: userMsg})
       })
       const data = await res.json()
-      setMessages(m => [...m, {from: 'server', text: data.reply}])
+      setMessages(m => [...m, {from: 'server', text: data.analysis}])
     }catch(e){
       setMessages(m => [...m, {from: 'server', text: 'Error contacting server.'}])
     }finally{
       sending.current = false
+      setIsLoading(false)
     }
   }
 
@@ -54,12 +57,22 @@ export default function App(){
             <div className="bubble">{m.text}</div>
           </div>
         ))}
+
+        {isLoading && (
+          <div className="msg server typing">
+            <div className="bubble">
+              <span className="dot" />
+              <span className="dot" />
+              <span className="dot" />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="composer">
-        <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={onKey} placeholder="Send a message" />
+        <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={onKey} placeholder="Send a message" disabled={isLoading} />
         <div className="composer-actions">
-          <button className="send" onClick={sendMessage}>Send</button>
+          <button className="send" onClick={sendMessage} disabled={isLoading}>{isLoading ? 'Sending...' : 'Send'}</button>
         </div>
       </div>
     </div>
