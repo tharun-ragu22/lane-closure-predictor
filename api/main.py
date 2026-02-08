@@ -71,19 +71,17 @@ def trigger_sumo_job(body: SimulationRequestBody):
     
     job_path = f"projects/{project}/locations/{location}/jobs/{job_name}"
 
-    # Build typed overrides via the client module to avoid static-import issues
-    container_override = run_v2.types.ContainerOverride(
-        args=[body.desc]
-    )
-
-    overrides_obj = run_v2.types.JobOverrides(
-        container_overrides=[container_override]
-    )
-
-    request = run_v2.RunJobRequest(
-        name=job_path,
-        overrides=overrides_obj
-    )
+    # Build overrides as plain dicts to avoid compatibility issues with
+    # different versions of the google-cloud-run client (some installs
+    # don't expose generated `types` classes like ContainerOverride).
+    request = {
+        "name": job_path,
+        "overrides": {
+            "container_overrides": [
+                {"args": [body.desc]}
+            ]
+        }
+    }
     
     try:
         
