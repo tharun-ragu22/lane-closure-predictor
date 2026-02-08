@@ -4,9 +4,18 @@ from google.cloud import storage
 import json
 from google.cloud import run_v2
 from pydantic import BaseModel
+from typing import Any
 
 class SimulationRequestBody(BaseModel):
     desc: str
+
+
+class ChatRequest(BaseModel):
+    message: str
+
+
+class ChatResponse(BaseModel):
+    reply: str
 
 app = FastAPI()
 
@@ -74,6 +83,21 @@ def trigger_sumo_job(body: SimulationRequestBody):
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to start simulation")
+
+
+@app.post("/api/chat", response_model=ChatResponse)
+def chat_endpoint(body: ChatRequest):
+    """Dummy chat endpoint returning a canned response based on input."""
+    user_msg = (body.message or "").strip()
+    # Very simple dummy logic
+    if not user_msg:
+        reply = "Please send a message."
+    elif "hello" in user_msg.lower():
+        reply = "Hi there! This is a dummy reply from the server." 
+    else:
+        reply = f"You said: {user_msg}. (This is a dummy server response.)"
+
+    return {"reply": reply}
 
 if __name__ == "__main__":
     # Cloud Run injects the PORT environment variable automatically
