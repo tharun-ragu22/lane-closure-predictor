@@ -23,6 +23,7 @@ app = FastAPI()
 # Define your frontend origins
 origins = [
     "http://localhost:5173",  # Local Vite dev server
+    "https://laneclosurepredictor.netlify.app"
 ]
 
 app.add_middleware(
