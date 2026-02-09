@@ -2,7 +2,7 @@ import React, {useState, useRef, useEffect} from 'react'
 
 export default function App(){
   const [messages, setMessages] = useState([
-    {from: 'server', text: 'Welcome — this is a dummy chat. Try saying "hello".'}
+    {from: 'server', text: 'Welcome. Please give a road stretch on the 401 between two roads (i.e. eastbound lane between Markham Road and McCowan Road) and I can tell you what will be the impact after blocking a lane temporarily'}
   ])
   const apiUrl = 'https://fastapi-test-626046981738.us-central1.run.app/'
   const [input, setInput] = useState('')
