@@ -4,4 +4,5 @@
 !hw_401.net.xml
 !hw_401.rou_big.xml
 .env
-/frontend/node_modules/**
+/frontend/*
+!/frontend/src/*
