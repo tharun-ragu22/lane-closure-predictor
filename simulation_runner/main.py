@@ -88,8 +88,13 @@ def save_results_to_gcs(data_dict):
 response = client.models.generate_content(
     model="gemini-2.5-flash",
     contents=f"""
-           These two XML files represent traffic data simulations before and after blocking a lane temporarily. Compare both data outputs and explain what the aggregate,
-             hollistic impact was on traffic when adding the block. This should include delays, unexpected braking, and length of congestion.
+           These two XML files represent traffic data simulations using SUMO before and after blocking a lane temporarily. Compare both data outputs and explain what the aggregate,
+             hollistic impact was on traffic when adding the block. This should include delays, unexpected braking, and length of congestion. 
+             
+             Your answer should mention the location that was blocked (i.e. from the user prompt {user_text})
+             the SUMO files itself, only high-level, aggregate observations that a non-technical person who has no idea that SUMO exists should be able to understand. For example, you should
+             not use terms that are specific to the SUMO simulation (i.e. code blocks, terms like emergencyStops, emergencyBraking), but use them in terms of general English (i.e. cars are more
+             likely to emergency stop, X cars were jammed for Y time until they were removed from the simulation etc.). You should not use any formatting in your answer, only return plaintext.
 
          without blocks:
 
