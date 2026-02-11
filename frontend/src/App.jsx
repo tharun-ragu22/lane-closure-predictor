@@ -1,8 +1,53 @@
 import React, {useState, useRef, useEffect} from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeSanitize from 'rehype-sanitize'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+
+function formatTimestamp(date = new Date()) {
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${hours}:${minutes}`
+}
+
+function Markdown({ children }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeSanitize]}
+      components={{
+        code({ node, inline, className, children, ...props }) {
+          const match = /language-(\w+)/.exec(className || '')
+          return !inline && match ? (
+            <SyntaxHighlighter
+              style={oneDark}
+              language={match[1]}
+              PreTag="div"
+              {...props}
+            >
+              {String(children).replace(/\n$/, '')}
+            </SyntaxHighlighter>
+          ) : (
+            <code className={className} {...props}>
+              {children}
+            </code>
+          )
+        }
+      }}
+    >
+      {children}
+    </ReactMarkdown>
+  )
+}
 
 export default function App(){
   const [messages, setMessages] = useState([
-    {from: 'server', text: 'Welcome. Please give a road stretch on the 401 between two roads (i.e. eastbound lane between Markham Road and McCowan Road) and I can tell you what will be the impact after blocking a lane temporarily'}
+    {
+      from: 'server',
+      text: 'Welcome. Please give a road stretch on the 401 between two roads (i.e. eastbound lane between Markham Road and McCowan Road) and I can tell you what will be the impact after blocking a lane temporarily',
+      timestamp: formatTimestamp()
+    }
   ])
   const apiUrl = 'https://fastapi-test-626046981738.us-central1.run.app/'
   const [input, setInput] = useState('')
@@ -19,7 +64,7 @@ export default function App(){
   async function sendMessage(){
     if(!input.trim() || sending.current) return
     const userMsg = input.trim()
-    setMessages(m => [...m, {from: 'user', text: userMsg}])
+    setMessages(m => [...m, {from: 'user', text: userMsg, timestamp: formatTimestamp()}])
     setInput('')
     sending.current = true
     setIsLoading(true)
@@ -66,12 +111,12 @@ export default function App(){
       }
 
       if(resultData){
-        setMessages(m => [...m, {from: 'server', text: resultData.analysis}])
+        setMessages(m => [...m, {from: 'server', text: resultData.analysis, timestamp: formatTimestamp()}])
       } else {
-        setMessages(m => [...m, {from: 'server', text: 'Simulation result not available after retries.'}])
+        setMessages(m => [...m, {from: 'server', text: 'Simulation result not available after retries.', timestamp: formatTimestamp()}])
       }
     }catch(e){
-      setMessages(m => [...m, {from: 'server', text: 'Error contacting server.'}])
+      setMessages(m => [...m, {from: 'server', text: 'Error contacting server.', timestamp: formatTimestamp()}])
     }finally{
       sending.current = false
       setIsLoading(false)
@@ -94,7 +139,10 @@ export default function App(){
       <div className="messages" ref={messagesRef}>
         {messages.map((m, i) => (
           <div key={i} className={`msg ${m.from}`}>
-            <div className="bubble">{m.text}</div>
+            <div className="bubble">
+              <Markdown>{m.text}</Markdown>
+              <div className="timestamp">{m.timestamp}</div>
+            </div>
           </div>
         ))}
 
